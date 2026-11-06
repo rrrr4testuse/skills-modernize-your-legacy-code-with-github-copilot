@@ -40,3 +40,56 @@ Owns the balance value and provides a read/write interface to `Operations`.
 - The balance is held in COBOL working storage, not a file or database. It is not durable across a fresh program initialization or process restart.
 
 Student-specific business rules, such as separate balances per student, student eligibility, or transaction limits, would need to be defined and added; none are present in these source files.
+
+## Data Flow
+
+```mermaid
+sequenceDiagram
+actor User
+participant Main as MainProgram
+participant Ops as Operations
+participant Data as DataProgram
+loop Until the user chooses Exit
+Main->>User: Display menu
+User-->>Main: Enter choice
+alt Choice 1: View balance
+Main->>Ops: CALL with TOTAL (six-character padded code)
+Ops->>Data: READ balance
+Data-->>Ops: Return balance
+Ops-->>User: Display current balance
+Ops-->>Main: Return from CALL
+else Choice 2: Credit account
+Main->>Ops: CALL with CREDIT
+Ops->>User: Prompt for credit amount
+User-->>Ops: Enter amount
+Ops->>Data: READ balance
+Data-->>Ops: Return balance
+Ops->>Ops: Add amount to balance
+Ops->>Data: WRITE updated balance
+Data-->>Ops: Return from CALL
+Ops-->>User: Display confirmation and new balance
+Ops-->>Main: Return from CALL
+else Choice 3: Debit account
+Main->>Ops: CALL with DEBIT (six-character padded code)
+Ops->>User: Prompt for debit amount
+User-->>Ops: Enter amount
+Ops->>Data: READ balance
+Data-->>Ops: Return balance
+alt Balance is sufficient
+Ops->>Ops: Subtract amount from balance
+Ops->>Data: WRITE updated balance
+Data-->>Ops: Return from CALL
+Ops-->>User: Display confirmation and new balance
+else Insufficient funds
+Ops-->>User: Display insufficient-funds message
+end
+Ops-->>Main: Return from CALL
+else Choice 4: Exit
+Main->>Main: Set continue flag to NO
+else Invalid choice
+Main-->>User: Display invalid-choice message
+end
+end
+Main-->>User: Display goodbye message
+Main->>Main: STOP RUN
+```
