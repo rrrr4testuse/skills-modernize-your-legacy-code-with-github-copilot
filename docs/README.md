@@ -43,7 +43,16 @@ Student-specific business rules, such as separate balances per student, student 
 
 ## Data Flow
 
-```mermaid
+```
+
+## Node.js application
+
+The COBOL flow is also implemented as a menu-driven Node.js command-line application in `src/accounting`.
+
+- Run `npm install` and `npm start` from `src/accounting`, or launch **Run Accounting Application** from VS Code's Run and Debug view.
+- Run `npm test` from `src/accounting` to execute the built-in Node.js test suite.
+- The balance starts at `1000.00` for each process and remains in memory only. Amounts are represented as integer cents, limited to two decimal places and the COBOL field maximum of `999999.99`. Debits that exceed the current balance do not update it.
+- The application uses Node.js built-in modules and has no third-party runtime dependencies.mermaid
 sequenceDiagram
 actor User
 participant Main as MainProgram
